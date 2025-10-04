@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import Navbar from "./components/Navbar";
+import Auth from "./components/Auth";
+import Dashboard from "./components/Dashboard";
+import './index.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [user, setUser] = useState(null);
+  const [company, setCompany] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+
+  useEffect(() => {
+    // Auto-create default company and Admin on first load
+    if (!company) {
+      const defaultCompany = {
+        id: 1,
+        name: "My Company",
+        country: "India",
+        currency: "INR",
+      };
+      setCompany(defaultCompany);
+
+      const adminUser = {
+        id: Date.now(),
+        name: "Admin User",
+        email: "admin@company.com",
+        role: "Admin",
+        managerId: null,
+      };
+      setUsers([adminUser]);
+    }
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen bg-gray-100">
+      <Navbar user={user} setUser={setUser} />
+      {!user ? (
+        <Auth setUser={setUser} users={users} setUsers={setUsers} />
+      ) : (
+        <Dashboard
+          user={user}
+          users={users}
+          setUsers={setUsers}
+          company={company}
+          expenses={expenses}
+          setExpenses={setExpenses}
+        />
+      )}
+    </div>
+  );
 }
-
-export default App
